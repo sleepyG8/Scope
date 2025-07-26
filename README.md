@@ -1,37 +1,31 @@
-# Scope 🔍🧬
+# IOCTL Scanner
 
-**Scope** is a memory-native ritual scanner for uncovering and interpreting the `.text` and `PAGE` sections of loaded kernel drivers on Windows systems. It blends manual PE parsing with undocumented APIs to paint symbolic maps of system modules—highlighting CALL invocations (`0xE8`) like glyphs etched into memory.
+The IOCTL Scanner is a memory-native tool built for identifying control codes within the `.text` and `PAGE` sections of loaded kernel drivers. It operates directly on raw memory to reveal symbolic IOCTL patterns without relying on import tables or user-mode APIs.
 
----
+## Features
 
-## 🌀 Purpose
+• Direct scanning of kernel driver sections mapped in memory  
+• Identification of IOCTL setup logic using byte-pattern recognition  
+• Extraction of literal control codes (`CTL_CODE(...)`) across driver space  
+• Symbolic logging of device names and IOCTL addresses  
+• Runtime-safe operation without injecting or altering live driver structures
 
-This tool isn't just a utility—it's a ceremonial compass for:
+## Use Cases
 
-- Tracing execution patterns within `ntoskrnl.exe` and other kernel drivers
-- Mapping `CALL` instructions inside `.text` for symbolic debugging and syscall choreography
-- Feeding data into reflective loaders, custom debuggers, and stealthy execution frameworks
+• Reverse engineering third-party or legacy drivers  
+• Tracing user-mode interfaces to kernel behavior  
+• Uncovering undocumented device control logic  
+• Enhancing reflective debugging and symbolic trace systems
 
----
+## Sample Output
 
-## ⚙️ How It Works
-
-1. Uses `NtQuerySystemInformation` (SystemModuleInformation) to enumerate loaded drivers
-2. Locates `ntoskrnl.exe` or target module by symbolic path
-3. Parses the PE manually, extracting `.text` and `PAGE` sections
-4. Highlights `0xE8` CALL opcodes for syscall tracing or ritual tagging
-
----
-
-## 🛠️ Build & Run
-
-### 🔧 Requirements
-- Windows (x64)
-- C compiler
-
-### 📦 Compile
 ```bash
-cl scope.c
+\SystemRoot\system32\ntoskrnl.exe
+0x 8D 0D 48 B2 8C 00 45 33 C0 48 89 45 - B8 48 8D 15 22 [186] 
+0x 05 41 03 F4 EB CE F0 48 0F C1 1D 97 - B8 72 00 40 22 [221]
+0x CD E9 85 FD FF FF F0 48 0F C1 1D 0C - B8 72 00 40 22 [221]
 ```
-### Usage:
-- scope.exe <\SystemRoot\system32\ntoskrnl.exe> (Any target module)
+## Build
+```bash
+• cl ioctl-scan.c 
+```
